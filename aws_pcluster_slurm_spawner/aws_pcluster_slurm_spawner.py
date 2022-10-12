@@ -7,20 +7,20 @@ from datetime import datetime
 from typing import List
 
 import batchspawner
-from aws_pcluster_helpers.models.sinfo import (SInfoTable, SinfoRow)
 from jinja2 import Environment, BaseLoader
 from slugify import slugify
 
 pcluster_spawner_template_paths = os.path.join(os.path.dirname(__file__), 'templates')
 
-from typing import Any
+from typing import Any, List
 import requests
 from async_generator import async_generator, yield_
 import os
 
 from tornado import gen
 
-from traitlets import Unicode, Dict
+from traitlets import Unicode
+from aws_pcluster_helpers.models.sinfo import (SInfoTable, SinfoRow)
 
 
 class PClusterSlurmSpawner(batchspawner.SlurmSpawner):
@@ -143,7 +143,7 @@ echo "jupyterhub-singleuser ended gracefully"
         return profile_form_template.render(profile_list=self._profile_list)
 
     @property
-    def profiles_list(self) -> List[Dict[str, Any]]:
+    def profiles_list(self) -> List[Any]:
         """
         List of profiles to offer for selection by the user.
         Signature is: `List(Dict())`, where each item is a dictionary that has two keys:
@@ -292,7 +292,8 @@ echo "jupyterhub-singleuser ended gracefully"
             }
         ]
         gpu_found = False
-        for group_record in self.sinfo.dataframe.to_dict('records'):
+        for group_record in sinfo.dataframe.to_dict('records'):
+            # for group_record in self.sinfo.dataframe.to_dict('records'):
             sinfo_name = group_record['sinfo_name']
             instance_type = group_record['ec2_instance_type']
 
