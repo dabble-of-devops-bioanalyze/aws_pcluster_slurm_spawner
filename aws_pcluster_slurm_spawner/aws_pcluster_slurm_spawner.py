@@ -10,7 +10,7 @@ import batchspawner
 from jinja2 import Environment, BaseLoader
 from slugify import slugify
 
-pcluster_spawner_template_paths = os.path.join(os.path.dirname(__file__), 'templates')
+# pcluster_spawner_template_paths = os.path.join(os.path.dirname(__file__), 'templates')
 
 from typing import Any, List
 import requests
@@ -20,12 +20,13 @@ import os
 from tornado import gen
 
 from traitlets import Unicode
-from aws_pcluster_helpers.models.sinfo import (SInfoTable, SinfoRow)
+from aws_pcluster_helpers.models.sinfo import SInfoTable, SinfoRow
 
 
 class PClusterSlurmSpawner(batchspawner.SlurmSpawner):
     # This is tied to the dict returned by the submission_data function
-    batch_script = Unicode("""#!/bin/bash
+    batch_script = Unicode(
+        """#!/bin/bash
 #SBATCH --output={{homedir}}/logs/jupyterhub_%j.log
 #SBATCH --job-name=jupyterhub
 #SBATCH --chdir={{homedir}}
@@ -49,7 +50,8 @@ which jupyterhub-singleuser
 {% if srun %}{{srun}} {% endif %}{{cmd}}
 echo "jupyterhub-singleuser ended gracefully"
 {{epilogue}}
-    """)
+    """
+    )
 
     profile_form_template = Unicode(
         """
@@ -130,8 +132,8 @@ echo "jupyterhub-singleuser ended gracefully"
     def _init_profile_list(self, profile_list):
         # generate missing slug fields from display_name
         for profile in profile_list:
-            if 'slug' not in profile:
-                profile['slug'] = slugify(profile['display_name'])
+            if "slug" not in profile:
+                profile["slug"] = slugify(profile["display_name"])
 
         return profile_list
 
@@ -267,47 +269,43 @@ echo "jupyterhub-singleuser ended gracefully"
         """
         profiles = [
             {
-                'display_name': f'CPU',
-                'slug': 'cpu',
-                'ami_name': 'Deep Learning',
-                'profile_options': {
-                    'instance_types': {
-                        'display_name': 'Instance Types',
-                        'choices': {
-                        }
-                    },
+                "display_name": f"CPU",
+                "slug": "cpu",
+                "ami_name": "Deep Learning",
+                "profile_options": {
+                    "instance_types": {"display_name": "Instance Types", "choices": {}},
                 },
             },
             {
-                'display_name': f'GPU',
-                'slug': 'gpu',
-                'ami_name': 'Deep Learning',
-                'profile_options': {
-                    'instance_types': {
-                        'display_name': 'Instance Types',
-                        'choices': {
-                        }
-                    },
+                "display_name": f"GPU",
+                "slug": "gpu",
+                "ami_name": "Deep Learning",
+                "profile_options": {
+                    "instance_types": {"display_name": "Instance Types", "choices": {}},
                 },
-            }
+            },
         ]
         gpu_found = False
-        for group_record in sinfo.dataframe.to_dict('records'):
+        for group_record in self.sinfo.dataframe.to_dict("records"):
             # for group_record in self.sinfo.dataframe.to_dict('records'):
-            sinfo_name = group_record['sinfo_name']
-            instance_type = group_record['ec2_instance_type']
+            sinfo_name = group_record["sinfo_name"]
+            instance_type = group_record["ec2_instance_type"]
 
-            mem = group_record['mem']
-            cpu = group_record['vcpu']
-            if len(group_record['gpus']):
-                profiles[1]['profile_options']['instance_types']['choices'][sinfo_name] = dict(
-                    display_name=f'{instance_type} - {cpu} CPU, {mem} GB',
+            mem = group_record["mem"]
+            cpu = group_record["vcpu"]
+            if len(group_record["gpus"]):
+                profiles[1]["profile_options"]["instance_types"]["choices"][
+                    sinfo_name
+                ] = dict(
+                    display_name=f"{instance_type} - {cpu} CPU, {mem} GB",
                     pclusterslurmspawner_override=group_record,
                 )
             else:
                 gpu_found = True
-                profiles[0]['profile_options']['instance_types']['choices'][sinfo_name] = dict(
-                    display_name=f'{instance_type} - {cpu} CPU, {mem} GB',
+                profiles[0]["profile_options"]["instance_types"]["choices"][
+                    sinfo_name
+                ] = dict(
+                    display_name=f"{instance_type} - {cpu} CPU, {mem} GB",
                     pclusterslurmspawner_override=group_record,
                 )
         if not gpu_found:
@@ -322,10 +320,20 @@ echo "jupyterhub-singleuser ended gracefully"
     def slurm_spawner_html_table(self):
         table = self.sinfo.dataframe
 
-        return table.to_html(table_id="slurm_spawner_table",
-                             classes='table  table-bordered display dataTable',
-                             columns=['sinfo_name', 'queue', 'constraint', 'ec2_instance_type', 'mem', 'vcpu',
-                                      'gpus'], index=False)
+        return table.to_html(
+            table_id="slurm_spawner_table",
+            classes="table  table-bordered display dataTable",
+            columns=[
+                "sinfo_name",
+                "queue",
+                "constraint",
+                "ec2_instance_type",
+                "mem",
+                "vcpu",
+                "gpus",
+            ],
+            index=False,
+        )
 
     def _options_form_default(self):
         sinfo = SInfoTable()
@@ -334,32 +342,32 @@ echo "jupyterhub-singleuser ended gracefully"
         try:
             profile_form = self._render_options_form(self.profiles_list)
         except Exception as e:
-            self.log.error('Got an error rendering the profiles list')
+            self.log.error("Got an error rendering the profiles list")
             self.log.error(e)
         if table.shape[0]:
             first_row: SinfoRow = table.iloc[0]
 
             defaults = {
-                'req_nprocs': str(first_row.vcpu),
-                'req_memory': str(first_row.mem),
-                'req_runtime': "08:00:00",
-                'req_partition': first_row.queue,
-                'req_options': '',
-                'req_custom_r': '',
-                'req_constraint': first_row.constraint,
-                'exclusive': True,
-                'job_prefix': self.job_prefix,
+                "req_nprocs": str(first_row.vcpu),
+                "req_memory": str(first_row.mem),
+                "req_runtime": "08:00:00",
+                "req_partition": first_row.queue,
+                "req_options": "",
+                "req_custom_r": "",
+                "req_constraint": first_row.constraint,
+                "exclusive": True,
+                "job_prefix": self.job_prefix,
                 # 'slurm_spawner_table': html_table,
-                'slurm_spawner_table': '',
-                'profile': profile_form,
+                "slurm_spawner_table": "",
+                "profile": profile_form,
             }
         else:
             # TODO If there's nothing in the table we have a problem
             defaults = {
-                'slurm_spawner_table': '',
-                'job_prefix': self.job_prefix,
+                "slurm_spawner_table": "",
+                "job_prefix": self.job_prefix,
                 # 'slurm_spawner_table': html_table,
-                'profile': profile_form,
+                "profile": profile_form,
             }
 
         form_options = """
@@ -404,42 +412,44 @@ echo "jupyterhub-singleuser ended gracefully"
         # self.log.debug('USER OPTIONS')
         # self.log.debug(self.user_options)
         # self.log.debug('-------------------------------')
-        queue = formdata['profile'][0]
-        sinfo_name = formdata[f'profile-option-{queue}-instance_types'][0]
-        records = self.sinfo.dataframe.loc[self.sinfo.dataframe['sinfo_name'] == sinfo_name].to_dict('records')
+        queue = formdata["profile"][0]
+        sinfo_name = formdata[f"profile-option-{queue}-instance_types"][0]
+        records = self.sinfo.dataframe.loc[
+            self.sinfo.dataframe["sinfo_name"] == sinfo_name
+        ].to_dict("records")
         record = records[0]
         for key in formdata.keys():
-            form_value = formdata.get(key, [''])
+            form_value = formdata.get(key, [""])
             if not form_value[0]:
                 if key in self.user_options:
                     form_value[0] = self.user_options[key]
 
             submission_data[key] = form_value[0]
 
-        submission_data['req_nprocs'] = str(record['vcpu'])
-        submission_data['req_memory'] = str(record['mem'])
-        submission_data['req_partition'] = record['queue']
-        submission_data['req_constraint'] = record['constraint']
+        submission_data["req_nprocs"] = str(record["vcpu"])
+        submission_data["req_memory"] = str(record["mem"])
+        submission_data["req_partition"] = record["queue"]
+        submission_data["req_constraint"] = record["constraint"]
 
         for key in submission_data.keys():
             setattr(self, key, submission_data[key])
 
-        if 'req_custom_r' in submission_data.keys():
-            custom_r = submission_data['req_custom_r']
+        if "req_custom_r" in submission_data.keys():
+            custom_r = submission_data["req_custom_r"]
             custom_r = os.path.split(custom_r)
-            if custom_r[1] == 'R':
+            if custom_r[1] == "R":
                 custom_r = custom_r[0]
             else:
                 custom_r = os.path.join(custom_r[0], custom_r[1])
-            submission_data['req_custom_r'] = custom_r
+            submission_data["req_custom_r"] = custom_r
 
-        if 'exclusive' in submission_data.keys():
-            submission_data['exclusive'] = True
+        if "exclusive" in submission_data.keys():
+            submission_data["exclusive"] = True
         else:
-            submission_data['exclusive'] = False
+            submission_data["exclusive"] = False
 
-        self.log.debug('-------------------------------')
-        self.log.debug('SUBMISSION_DATA')
+        self.log.debug("-------------------------------")
+        self.log.debug("SUBMISSION_DATA")
         self.log.debug(submission_data)
 
         return submission_data
@@ -447,7 +457,7 @@ echo "jupyterhub-singleuser ended gracefully"
     @async_generator
     async def progress(self):
         state = self.get_state()
-        dt = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+        dt = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
         await yield_(
             {
                 "message": f"""
@@ -488,6 +498,6 @@ echo "jupyterhub-singleuser ended gracefully"
             await gen.sleep(1)
 
 
-def get_ec2_address(address_type='public-ipv4') -> str:
-    response = requests.get(f'http://169.254.169.254/latest/meta-data/{address_type}')
-    return response.content.decode('utf-8')
+def get_ec2_address(address_type="public-ipv4") -> str:
+    response = requests.get(f"http://169.254.169.254/latest/meta-data/{address_type}")
+    return response.content.decode("utf-8")
