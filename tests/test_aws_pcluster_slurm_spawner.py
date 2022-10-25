@@ -41,3 +41,5 @@ def test_imports():
 def test_profiles():
     spawner = PClusterSlurmSpawner()
     debug(spawner.profiles_list)
+    console = Console()
+    console.print(spawner.sinfo.dataframe)

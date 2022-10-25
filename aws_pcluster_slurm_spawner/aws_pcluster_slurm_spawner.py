@@ -314,7 +314,11 @@ echo "jupyterhub-singleuser ended gracefully"
 
     @property
     def sinfo(self):
-        return SInfoTable()
+        sinfo = SInfoTable()
+        df = sinfo.dataframe
+        df.sort_values(by=["mem", "vcpu", "cpu", "queue"], inplace=True)
+        sinfo.dataframe = df
+        return sinfo
 
     @property
     def slurm_spawner_html_table(self):
@@ -416,7 +420,7 @@ echo "jupyterhub-singleuser ended gracefully"
         sinfo_name = formdata[f"profile-option-{queue}-instance_types"][0]
         records = self.sinfo.dataframe.loc[
             self.sinfo.dataframe["sinfo_name"] == sinfo_name
-        ].to_dict("records")
+            ].to_dict("records")
         record = records[0]
         for key in formdata.keys():
             form_value = formdata.get(key, [""])
