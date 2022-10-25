@@ -29,6 +29,15 @@ os.environ[ENV_INSTANCE_TYPES_DATA_FILE] = instance_types_data_file
 os.environ[ENV_PCLUSTER_CONFIG_FILE] = pcluster_config_file
 
 
+def test_imports():
+    from aws_pcluster_slurm_spawner import (
+        PClusterSlurmSpawner,
+        pcluster_spawner_template_paths,
+    )
+
+    assert os.path.exists(pcluster_spawner_template_paths)
+
+
 def test_profiles():
     spawner = PClusterSlurmSpawner()
     debug(spawner.profiles_list)
