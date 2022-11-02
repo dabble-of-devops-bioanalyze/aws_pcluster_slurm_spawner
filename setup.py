@@ -36,7 +36,7 @@ setup(
     long_description=readme + "\n\n" + history,
     include_package_data=True,
     keywords="aws_pcluster_slurm_spawner",
-    name="aws_pcluster_slurm_spawner",
+    name="aws-pcluster-slurm-spawner",
     packages=find_packages(
         include=["aws_pcluster_slurm_spawner", "aws_pcluster_slurm_spawner.*"]
     ),
