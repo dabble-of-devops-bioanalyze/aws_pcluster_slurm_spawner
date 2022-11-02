@@ -6,7 +6,7 @@ __email__ = "jillian@dabbleofdevops.com"
 import os
 
 from aws_pcluster_slurm_spawner.aws_pcluster_slurm_spawner import (
-    PClusterSlurmSpawner,
+    PClusterSlurmSpawner, get_ec2_address
 )
 
 pcluster_spawner_template_paths = os.path.join(os.path.dirname(__file__), "templates")
