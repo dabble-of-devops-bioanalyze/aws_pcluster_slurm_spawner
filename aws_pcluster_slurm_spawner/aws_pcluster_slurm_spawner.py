@@ -358,6 +358,7 @@ echo "jupyterhub-singleuser ended gracefully"
                 "req_partition": first_row.queue,
                 "req_options": "",
                 "req_custom_r": "",
+                "req_custom_env": "",
                 "req_constraint": first_row.constraint,
                 "exclusive": True,
                 "job_prefix": self.job_prefix,
@@ -393,6 +394,13 @@ echo "jupyterhub-singleuser ended gracefully"
 <div class="form-group">
     <label for="options">Options (additional options such as -N 4 for multiple nodes)</label>
     <input type="text" class="form-control" value="{{req_options}}" placeholder="{req_options}" id="options" name="req_options"/>
+</div>
+
+<div class="form-group">
+    <label for="custom_env">Custom Env (spack load my-env). You should only need this option for custom R environments!</label>
+    <textarea id="custom_env" name="req_custom_env" rows="4" cols="50">
+    {{req_custom_env}}
+    </textarea>
 </div>
 
 <div class="form-group">
