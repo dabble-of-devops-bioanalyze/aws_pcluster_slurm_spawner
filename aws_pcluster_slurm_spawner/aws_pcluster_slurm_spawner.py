@@ -449,6 +449,11 @@ echo "jupyterhub-singleuser ended gracefully"
         for key in submission_data.keys():
             setattr(self, key, submission_data[key])
 
+        if "req_custom_env" in submission_data.keys():
+            l = submission_data["req_custom_env"]
+            l = "\n".join(l.splitlines())
+            submission_data["req_custom_env"] = l
+
         if "req_custom_r" in submission_data.keys():
             custom_r = submission_data["req_custom_r"]
             custom_r = os.path.split(custom_r)
