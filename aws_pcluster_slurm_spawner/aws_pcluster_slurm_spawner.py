@@ -46,6 +46,9 @@ trap 'echo SIGTERM received' TERM
 # Custom R
 {% if req_custom_r    %}export PATH="{{req_custom_r}}:$PATH"{% endif %}
 
+# Custom Env
+{% if req_custom_env    %}{{req_custom_env}}{% endif %}
+
 which jupyterhub-singleuser
 {% if srun %}{{srun}} {% endif %}{{cmd}}
 echo "jupyterhub-singleuser ended gracefully"
