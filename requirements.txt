@@ -1,5 +1,4 @@
 batchspawner
-jupyter-rsession-proxy
 datasize
 humanize
 boto3
