@@ -49,7 +49,7 @@ def test_sinfo():
     sinfo = SInfoTable()
     table = sinfo.get_table()
     console = Console()
-    console.print(table)
+    # console.print(table)
 
 
 def test_load_pcluster_config():

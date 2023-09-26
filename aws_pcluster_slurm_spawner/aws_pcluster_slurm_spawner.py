@@ -314,7 +314,8 @@ echo "jupyterhub-singleuser ended gracefully"
         sinfo = SInfoTable()
         df = sinfo.dataframe
         df.sort_values(by=["mem", "vcpu", "cpu", "queue"], inplace=True)
-        sinfo.dataframe = df
+        sinfo = SInfoTable(dataframe=df)
+        # sinfo.dataframe = df
         return sinfo
 
     @property
