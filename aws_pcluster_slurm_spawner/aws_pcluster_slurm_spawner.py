@@ -295,7 +295,7 @@ echo "jupyterhub-singleuser ended gracefully"
                 profiles[1]["profile_options"]["instance_types"]["choices"][
                     sinfo_name
                 ] = dict(
-                    display_name=f"{instance_type:10s} | {cpu:5s} CPU, {mem:6s} GB",
+                    display_name=f"{instance_type:15s} | {cpu:5s} CPU, {mem:6s} GB",
                     pclusterslurmspawner_override=group_record,
                 )
             else:
@@ -303,7 +303,7 @@ echo "jupyterhub-singleuser ended gracefully"
                 profiles[0]["profile_options"]["instance_types"]["choices"][
                     sinfo_name
                 ] = dict(
-                    display_name=f"{instance_type:10s} | {cpu:5s} CPU | {mem:6s} GB",
+                    display_name=f"{instance_type:15s} | {cpu:5s} CPU | {mem:6s} GB",
                     pclusterslurmspawner_override=group_record,
                 )
         if not gpu_found:
